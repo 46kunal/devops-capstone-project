@@ -2,7 +2,7 @@
 
 Project name: **Customer Accounts**
 
-![Build and test](https://github.com/OWNER/customer-accounts/actions/workflows/ci.yml/badge.svg)
+![CI Build](https://github.com/OWNER/customer-accounts/actions/workflows/ci-build.yaml/badge.svg)
 
 A Flask REST API backed by SQLite. It supports account creation, listing, retrieval, update, and deletion. Set `API_TOKEN` to require a bearer token for all account routes. `/health` remains public for probes.
 
@@ -18,7 +18,8 @@ Use `Authorization: Bearer change-me` for `/accounts` requests.
 
 ```bash
 pytest -q
-ruff check service tests
+flake8 service tests
+nosetests -v
 docker build -t customer-accounts:local .
 ```
 

@@ -61,3 +61,25 @@ spec:
       workspaces:
         - name: source
           workspace: source
+    - name: deploy
+      runAfter: [build]
+      taskSpec:
+        params:
+          - name: image
+            type: string
+        workspaces:
+          - name: source
+        steps:
+          - name: kubectl
+            image: bitnami/kubectl:1.31
+            workingDir: $(workspaces.source.path)
+            script: |
+              kubectl apply -f k8s/
+              kubectl set image deployment/customer-accounts api=$(params.image)
+              kubectl rollout status deployment/customer-accounts --timeout=180s
+      params:
+        - name: image
+          value: $(params.image)
+      workspaces:
+        - name: source
+          workspace: source

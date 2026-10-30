@@ -8,15 +8,19 @@ from functools import wraps
 
 from flask import Flask, jsonify, request
 
+from service import configure_security
+
 
 def create_app(test_config=None):
     app = Flask(__name__)
     app.config.update(
         DATABASE=os.environ.get("DATABASE", os.path.join(tempfile.gettempdir(), "accounts.db")),
         API_TOKEN=os.environ.get("API_TOKEN", ""),
+        CORS_ORIGINS=os.environ.get("CORS_ORIGINS", "http://localhost:3000").split(","),
     )
     if test_config:
         app.config.update(test_config)
+    configure_security(app)
 
     def connect():
         db = sqlite3.connect(app.config["DATABASE"])
@@ -55,7 +59,11 @@ def create_app(test_config=None):
             return "name must be a nonempty string"
         if "email" in data and (not isinstance(data["email"], str) or "@" not in data["email"]):
             return "email must be valid"
-        if "balance" in data and (isinstance(data["balance"], bool) or not isinstance(data["balance"], (int, float)) or data["balance"] < 0):
+        if "balance" in data and (
+            isinstance(data["balance"], bool)
+            or not isinstance(data["balance"], (int, float))
+            or data["balance"] < 0
+        ):
             return "balance must be a nonnegative number"
         if "active" in data and not isinstance(data["active"], bool):
             return "active must be boolean"
@@ -64,6 +72,10 @@ def create_app(test_config=None):
     @app.get("/health")
     def health():
         return jsonify(status="ok")
+
+    @app.get("/")
+    def home():
+        return jsonify(service="Customer Accounts", status="ok")
 
     @app.get("/accounts")
     @authorized
