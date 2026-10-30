@@ -1,0 +1,63 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: customer-accounts-ci
+spec:
+  params:
+    - name: git-url
+      type: string
+    - name: git-revision
+      type: string
+      default: main
+    - name: image
+      type: string
+  workspaces:
+    - name: source
+  tasks:
+    - name: fetch
+      taskRef:
+        resolver: hub
+        params:
+          - name: name
+            value: git-clone
+          - name: version
+            value: '0.9'
+      params:
+        - name: url
+          value: $(params.git-url)
+        - name: revision
+          value: $(params.git-revision)
+      workspaces:
+        - name: output
+          workspace: source
+    - name: test
+      runAfter: [fetch]
+      taskSpec:
+        workspaces:
+          - name: source
+        steps:
+          - name: pytest
+            image: python:3.12-slim
+            workingDir: $(workspaces.source.path)
+            script: |
+              pip install -r requirements-dev.txt
+              ruff check service tests
+              pytest -q
+      workspaces:
+        - name: source
+          workspace: source
+    - name: build
+      runAfter: [test]
+      taskRef:
+        resolver: hub
+        params:
+          - name: name
+            value: buildah
+          - name: version
+            value: '0.8'
+      params:
+        - name: IMAGE
+          value: $(params.image)
+      workspaces:
+        - name: source
+          workspace: source
