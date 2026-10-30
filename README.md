@@ -2,7 +2,7 @@
 
 Project name: **Customer Accounts**
 
-![CI Build](https://github.com/OWNER/customer-accounts/actions/workflows/ci-build.yaml/badge.svg)
+![CI Build](https://github.com/46kunal/customer-accounts/actions/workflows/ci-build.yaml/badge.svg)
 
 A Flask REST API backed by SQLite. It supports account creation, listing, retrieval, update, and deletion. Set `API_TOKEN` to require a bearer token for all account routes. `/health` remains public for probes.
 
@@ -25,7 +25,7 @@ docker build -t customer-accounts:local .
 
 ## Deployment
 
-Replace `OWNER` in the badge and Kubernetes image with your GitHub owner. Build and push the image to your registry. Create `customer-accounts-secret` with key `api-token`, then apply `k8s/`. The SQLite PVC supports one replica; use a shared database before scaling horizontally. The Tekton pipeline requires an installed Hub resolver and registry credentials in its workspace service account.
+Replace `OWNER` in the Kubernetes image with your GitHub owner. Build and push the image to your registry. Create `customer-accounts-secret` with key `api-token`, then apply `k8s/`. The SQLite PVC supports one replica; use a shared database before scaling horizontally. The Tekton pipeline requires an installed Hub resolver and registry credentials in its workspace service account.
 
 ## API
 
