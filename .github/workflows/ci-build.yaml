@@ -20,3 +20,10 @@ jobs:
         run: nosetests -v
       - name: Build Docker image
         run: docker build -t customer-accounts:ci .
+      - name: Capture REST and image evidence
+        run: bash scripts/capture-evidence.sh
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: capstone-evidence
+          path: evidence/*.txt
